@@ -3,10 +3,13 @@
 -record(person, {name, age, phone, email}).
 
 create(Name) -> %create table Name
-	ets:new(Name, [bag, named_table, {keypos,1}]). %default keypos=1
+	ets:new(Name, [bag, named_table, {keypos,2}]). %default keypos=1
 
 insert(Name, P=#person{}) -> %insert new object for table Name
-	ets:insert(Name, {P#person.name, P#person.age, P#person.phone, P#person.email}).  
+	io:format("You're about to insert ~p into table ~p~n",[P#person.name, Name]),
+	Index = len(ets:tab2list(Name))+1,
+	ets:insert(Name, {Index, P#person.name, P#person.age, P#person.phone, P#person.email}),
+	print(Name).  
 
 search(Name, P=#person{}) -> %search name person P in Name, mean key 
 	io:format("Search person ~p~n",[P#person.name]),
@@ -16,7 +19,7 @@ search(Name, Arg) -> %search key=_arg
 	io:format("Search _arg~n"),
 	ets:lookup(Name, Arg).
 
-create_person() -> %return a record
+create_person() -> %return a person record
 	#person{name=pick_name(), age=pick_age(), phone=pick_phone(), email=pick_email()}.
 
 is_person(Arg) -> is_record(Arg, person). %check if Arg a is a person record
@@ -44,6 +47,9 @@ pick_name() -> %random name
 	lists:nth(random:uniform(6), middlename())
     ++ " " ++
     lists:nth(random:uniform(10), lastnames()).
+
+len([]) -> 0; %caculating length of list
+len([_|T]) -> 1+ len(T).
 %=========================================================================%
 email() ->
 	["hihi", "hehe", "keke", "kaka", "kiki", "muahaha", "haha", "huahua", "huahuata", "ahihi"].
@@ -51,9 +57,9 @@ domain() ->
 	["@gmail.com", "@yahoo.com", "@outlock.com"].
 firstnames() ->
     ["Nguyen", "Hoang", "Le", "Phan", "Pham",
-     "Đo", "Ngo", "Trinh", "Luu", "Tran"].
+     "Do", "Ngo", "Trinh", "Luu", "Tran"].
 middlename() ->
-	["Van", "Thi", "Đuc", "Quoc", "Bao", "Thanh"].
+	["Van", "Thi", "Duc", "Quoc", "Bao", "Thanh"].
 lastnames() ->
     ["Auto", "Hai", "Truong", "Viet", "Nhan",
      "Long", "Hung", "Nga", "Lien", "Ly"].
